@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahmed Profile App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle at 50% 50%, #4a2505 0%, #12090b 50%, #0a060a 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Top Left Planet SVG Container */
+        .planet-container {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            width: 4.5rem;
+            height: 4.5rem;
+        }
+
+        /* Reels Container */
+        .reels-carousel {
+            border: 1px solid rgba(255, 177, 0, 0.25);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+            padding: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+            position: relative;
+            margin-bottom: 2rem;
+            z-index: 10;
+            max-width: 90vw;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .reels-carousel::-webkit-scrollbar { display: none; }
+
+        .reel-card {
+            min-width: 4.5rem;
+            height: 7rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 177, 0, 0.2);
+            background: #111;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .reel-card:hover { transform: scale(1.05); }
+
+        .reel-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reel-play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .add-reel-btn {
+            min-width: 4.5rem;
+            height: 7rem;
+            border-radius: 0.75rem;
+            border: 2px dashed rgba(255, 177, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ffb100;
+            font-size: 1.5rem;
+        }
+
+        /* Fullscreen Video Overlay */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-overlay.active { display: flex; }
+        .video-overlay video {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 1rem;
+        }
+        .close-video {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #151515;
+            border: 1px solid rgba(255, 177, 0, 0.3);
+            color: #ffb100;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.2s;
+        }
+        .nav-arrow:hover { background: #222; }
+        .nav-arrow.left { left: -1.1rem; }
+        .nav-arrow.right { right: -1.1rem; }
+
+        /* Profile */
+        .profile-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-img {
+            width: 18rem;
+            height: 18rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffb100;
+            box-shadow: 0 0 30px rgba(255, 177, 0, 0.5), inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .status-dot {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: #00d98f;
+            border-radius: 50%;
+            border: 3px solid #1a110a;
+        }
+
+        /* Title */
+        .main-title {
+            color: #ffb100;
+            font-weight: 900;
+            font-size: 4rem;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 20px rgba(255, 177, 0, 0.4);
+            margin: 0 0 2rem 0;
+            line-height: 1;
+        }
+
+        /* Buttons */
+        .action-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 177, 0, 0.4);
+            color: white;
+            padding: 0.6rem 1.75rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            background: rgba(255, 177, 0, 0.15);
+        }
+        .action-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Corner Buttons */
+        .corner-btn {
+            position: absolute;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 177, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffb100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.2s;
+        }
+        .corner-btn:hover {
+            background: rgba(255, 177, 0, 0.1);
+        }
+        .corner-btn.bottom-left {
+            bottom: 2rem;
+            left: 2.5rem;
+        }
+        .corner-btn.bottom-right {
+            bottom: 2rem;
+            right: 2.5rem;
+        }
+
+        /* Tool Grid */
+        .tool-grid {
+            position: absolute;
+            bottom: 6.5rem;
+            right: 2.5rem;
+            background: rgba(25, 25, 25, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.25rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            width: 4rem;
+            height: 4rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .tool-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+        .tool-cell:nth-child(1) { border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); color: #eab308; } /* shieldish */
+        .tool-cell:nth-child(2) { border-bottom: 1px solid rgba(255,255,255,0.05); color: #a855f7; } /* feather */
+        .tool-cell:nth-child(3) { border-right: 1px solid rgba(255,255,255,0.05); color: #22c55e; } /* whatsapp */
+        .tool-cell:nth-child(4) { color: #f97316; } /* java */
+        
+        /* shield custom look */
+        .shield-icon {
+            position: relative;
+        }
+        .shield-icon::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -4px;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 2px;
+            z-index: -1;
+        }
+        /* Theme Menu */
+        .theme-menu {
+            position: absolute;
+            bottom: 6.5rem;
+            left: 2.5rem;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 177, 0, 0.3);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(10px);
+            z-index: 50;
+        }
+        .theme-menu.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .color-option {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <script>
+        function toggleThemes() {
+            document.getElementById('themeMenu').classList.toggle('active');
+        }
+        
+        function triggerVideoUpload() {
+            document.getElementById('videoInput').click();
+        }
+
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                addReel(url);
+            }
+        }
+
+        function addReel(url) {
+            const carousel = document.getElementById('reelsCarousel');
+            const card = document.createElement('div');
+            card.className = 'reel-card';
+            card.onclick = () => openVideo(url);
+            card.innerHTML = `
+                <video src="${url}" class="reel-thumbnail" muted></video>
+                <div class="reel-play-icon"><i class="fas fa-play"></i></div>
+            `;
+            carousel.insertBefore(card, carousel.firstChild);
+        }
+
+        function openVideo(url) {
+            const overlay = document.getElementById('videoOverlay');
+            const video = document.getElementById('player');
+            video.src = url;
+            overlay.classList.add('active');
+            video.play();
+        }
+
+        function closeVideo() {
+            const overlay = document.getElementById('videoOverlay');
+            const video = document.getElementById('player');
+            video.pause();
+            overlay.classList.remove('active');
+        }
+
+        function changeTheme(color, bgGradient) {
+            document.documentElement.style.setProperty('--main-color', color);
+            document.body.style.background = bgGradient;
+            
+            // Update all elements with orange borders/text
+            const elements = document.querySelectorAll('.main-title, .nav-arrow, .story-avatar, .corner-btn, .action-btn, .profile-img');
+            elements.forEach(el => {
+                if (el.classList.contains('main-title')) el.style.color = color;
+                if (el.style.borderColor !== undefined) el.style.borderColor = color;
+                if (el.classList.contains('nav-arrow')) el.style.color = color;
+                if (el.classList.contains('corner-btn')) el.style.color = color;
+            });
+            
+            // Inline style overrides for specific elements
+            document.querySelector('.main-title').style.color = color;
+            document.querySelector('.profile-img').style.borderColor = color;
+            document.querySelectorAll('.nav-arrow').forEach(a => a.style.color = color);
+            document.querySelectorAll('.corner-btn').forEach(b => b.style.color = color);
+            document.querySelectorAll('.action-btn').forEach(b => b.style.borderColor = color);
+            document.querySelectorAll('.story-avatar').forEach(s => s.style.borderColor = color);
+        }
+    </script>
+</head>
+<body>
+
+    <!-- Planet -->
+    <div class="planet-container">
+        <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-[20deg] drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]">
+            <defs>
+                <radialGradient id="planetGrad" cx="35%" cy="35%" r="65%">
+                    <stop offset="0%" stop-color="#38bdf8"/>
+                    <stop offset="100%" stop-color="#0284c7"/>
+                </radialGradient>
+                <clipPath id="bottomHalf">
+                    <rect x="0" y="50" width="100" height="50" />
+                </clipPath>
+            </defs>
+            <ellipse cx="50" cy="50" rx="42" ry="7" fill="none" stroke="#ffb100" stroke-width="2.5" />
+            <circle cx="50" cy="50" r="20" fill="url(#planetGrad)" />
+            <ellipse cx="50" cy="50" rx="42" ry="7" fill="none" stroke="#ffb100" stroke-width="2.5" clip-path="url(#bottomHalf)" />
+        </svg>
+    </div>
+
+    <!-- Reels Carousel -->
+    <div class="reels-carousel" id="reelsCarousel">
+        <div class="add-reel-btn" onclick="triggerVideoUpload()">
+            <i class="fas fa-plus"></i>
+        </div>
+        <input type="file" id="videoInput" accept="video/*" class="hidden" onchange="handleVideoUpload(event)">
+    </div>
+
+    <!-- Video Overlay -->
+    <div id="videoOverlay" class="video-overlay">
+        <div class="close-video" onclick="closeVideo()">&times;</div>
+        <video id="player" controls></video>
+    </div>
+
+    <!-- Profile -->
+    <div class="profile-wrapper">
+        <img src="https://replicate.delivery/xezq/ej6EeQpBWPqOl0H0eshOYmQRDwwd7Qvsknf1846yNmw8YiQZB/out.png" class="profile-img" alt="Ahmed Profile">
+        <div class="status-dot"></div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="main-title">AKEEL</h1>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-4">
+        <button class="action-btn">
+            <i class="fab fa-facebook"></i>
+            <span>Facebook</span>
+        </button>
+        <button class="action-btn">
+            <i class="fab fa-github"></i>
+            <span>GitHub</span>
+        </button>
+        <button class="action-btn">
+            <i class="far fa-comment-alt"></i>
+            <span>Forum</span>
+        </button>
+    </div>
+
+    <!-- Theme Menu -->
+    <div id="themeMenu" class="theme-menu">
+        <div class="color-option" style="background: #ffb100;" onclick="changeTheme('#ffb100', 'radial-gradient(circle at 50% 50%, #4a2505 0%, #12090b 50%, #0a060a 100%)')"></div>
+        <div class="color-option" style="background: #38bdf8;" onclick="changeTheme('#38bdf8', 'radial-gradient(circle at 50% 50%, #0c2b3a 0%, #050e14 50%, #02060a 100%)')"></div>
+        <div class="color-option" style="background: #ef4444;" onclick="changeTheme('#ef4444', 'radial-gradient(circle at 50% 50%, #3d0a0a 0%, #140505 50%, #0a0202 100%)')"></div>
+        <div class="color-option" style="background: #22c55e;" onclick="changeTheme('#22c55e', 'radial-gradient(circle at 50% 50%, #0a2e14 0%, #051408 50%, #020a04 100%)')"></div>
+        <div class="color-option" style="background: #a855f7;" onclick="changeTheme('#a855f7', 'radial-gradient(circle at 50% 50%, #2e0a3d 0%, #14051a 50%, #0a0210 100%)')"></div>
+        <div class="color-option" style="background: #f472b6;" onclick="changeTheme('#f472b6', 'radial-gradient(circle at 50% 50%, #3d0a25 0%, #1a0510 50%, #10020a 100%)')"></div>
+    </div>
+
+    <!-- Corners -->
+    <button class="corner-btn bottom-left" title="Color options" onclick="toggleThemes()">
+        <i class="fas fa-palette"></i>
+    </button>
+
+    <button class="corner-btn bottom-right">
+        <i class="fas fa-cog"></i>
+    </button>
+
+</body>
+</html>
