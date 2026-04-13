@@ -1,5 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stories</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Story Circle -->
 <div class="story-circle" onclick="openAdminLogin()">
   <img src="https://via.placeholder.com/100" />
+</div>
+
+<!-- عرض القصة -->
+<div id="storyViewer" class="modal">
+  <video id="storyVideo" controls autoplay></video>
 </div>
 
 <!-- Admin Login -->
@@ -17,3 +32,7 @@
 
   <button onclick="submitStory()">Add Story</button>
 </div>
+
+<script src="script.js"></script>
+</body>
+</html>
